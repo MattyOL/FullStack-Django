@@ -1,6 +1,7 @@
 from unicodedata import name
 from django.shortcuts import render, redirect
 from .models import Item
+from .forms import ItemForm
 
 # Create your views here.
 
@@ -15,9 +16,17 @@ def get_todo_list(request):
 
 def add_item(request):
     if request.method == 'post':
-        name = request.POST.get('item_name')
-        done = 'done' in request.post
-        Item.objects.create(name=name, done=done)
+        form = ItemForm(request.POST)
+        if form.is_valid():
+            form.save()   
+            return redirect('get_todo_list')
+    form = ItemForm()
+    context = {
+        'form': form
+    }
 
-        return redirect('get_todo_list')
-    return render(request, 'todo/add_item.html')
+    return render(request, 'todo/add_item.html', context)
+
+
+def edit_item(request, item_id):
+    return render(request, 'todo/edit_item.html')
